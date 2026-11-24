@@ -1,4 +1,5 @@
-export const server = "http://localhost:4444";
+export const server =
+  "https://web-apps-arpitprojectserver-mxvm3f-678ce6-187-127-166-234.sslip.io";
 
 const apiList = {
   login: `${server}/auth/login`,
