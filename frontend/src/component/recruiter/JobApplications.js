@@ -1,347 +1,220 @@
 import { useState, useEffect, useContext } from "react";
-import {
-  Button,
-  Chip,
-  Grid,
-  IconButton,
-  InputAdornment,
-  makeStyles,
-  Paper,
-  TextField,
-  Typography,
-  Modal,
-  Slider,
-  FormControlLabel,
-  FormGroup,
-  MenuItem,
-  Checkbox,
-  Avatar,
-} from "@material-ui/core";
 import { useParams } from "react-router-dom";
-import Rating from "@material-ui/lab/Rating";
 import axios from "axios";
 import FilterListIcon from "@material-ui/icons/FilterList";
 import ArrowUpwardIcon from "@material-ui/icons/ArrowUpward";
 import ArrowDownwardIcon from "@material-ui/icons/ArrowDownward";
+import {
+  EventNote,
+  SchoolOutlined,
+  DescriptionOutlined,
+  GetApp,
+  Star,
+  StarBorder,
+  Close as CloseIcon,
+  PersonOutline,
+  AssignmentOutlined,
+  CheckCircleOutline,
+  CancelOutlined,
+  PlaylistAddCheck,
+} from "@material-ui/icons";
 
 import { SetPopupContext } from "../../App";
 
 import apiList, { server } from "../../lib/apiList";
 
-const useStyles = makeStyles((theme) => ({
-  body: {
-    height: "inherit",
-  },
-  statusBlock: {
-    width: "100%",
-    height: "100%",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    textTransform: "uppercase",
-  },
-  jobTileOuter: {
-    padding: "30px",
-    margin: "20px 0",
-    boxSizing: "border-box",
-    width: "100%",
-  },
-  popupDialog: {
-    height: "100%",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  avatar: {
-    width: theme.spacing(17),
-    height: theme.spacing(17),
-  },
-}));
-
 const FilterPopup = (props) => {
-  const classes = useStyles();
   const { open, handleClose, searchOptions, setSearchOptions, getData } = props;
-  return (
-    <Modal open={open} onClose={handleClose} className={classes.popupDialog}>
-      <Paper
-        style={{
-          padding: "50px",
-          outline: "none",
-          minWidth: "50%",
-        }}
-      >
-        <Grid container direction="column" alignItems="center" spacing={3}>
-          <Grid container item alignItems="center">
-            <Grid item xs={3}>
-              Application Status
-            </Grid>
-            <Grid
-              container
-              item
-              xs={9}
-              justify="space-around"
-              // alignItems="center"
-            >
-              <Grid item>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      name="rejected"
-                      checked={searchOptions.status.rejected}
-                      onChange={(event) => {
-                        setSearchOptions({
-                          ...searchOptions,
-                          status: {
-                            ...searchOptions.status,
-                            [event.target.name]: event.target.checked,
-                          },
-                        });
-                      }}
-                    />
-                  }
-                  label="Rejected"
-                />
-              </Grid>
-              <Grid item>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      name="applied"
-                      checked={searchOptions.status.applied}
-                      onChange={(event) => {
-                        setSearchOptions({
-                          ...searchOptions,
-                          status: {
-                            ...searchOptions.status,
-                            [event.target.name]: event.target.checked,
-                          },
-                        });
-                      }}
-                    />
-                  }
-                  label="Applied"
-                />
-              </Grid>
-              <Grid item>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      name="shortlisted"
-                      checked={searchOptions.status.shortlisted}
-                      onChange={(event) => {
-                        setSearchOptions({
-                          ...searchOptions,
-                          status: {
-                            ...searchOptions.status,
-                            [event.target.name]: event.target.checked,
-                          },
-                        });
-                      }}
-                    />
-                  }
-                  label="Shortlisted"
-                />
-              </Grid>
-            </Grid>
-          </Grid>
-          <Grid container item alignItems="center">
-            <Grid item xs={3}>
-              Sort
-            </Grid>
-            <Grid item container direction="row" xs={9}>
-              <Grid
-                item
-                container
-                xs={4}
-                justify="space-around"
-                alignItems="center"
-                style={{ border: "1px solid #D1D1D1", borderRadius: "5px" }}
-              >
-                <Grid item>
-                  <Checkbox
-                    name="name"
-                    checked={searchOptions.sort["jobApplicant.name"].status}
-                    onChange={(event) =>
-                      setSearchOptions({
-                        ...searchOptions,
-                        sort: {
-                          ...searchOptions.sort,
-                          "jobApplicant.name": {
-                            ...searchOptions.sort["jobApplicant.name"],
-                            status: event.target.checked,
-                          },
-                        },
-                      })
-                    }
-                    id="name"
-                  />
-                </Grid>
-                <Grid item>
-                  <label for="name">
-                    <Typography>Name</Typography>
-                  </label>
-                </Grid>
-                <Grid item>
-                  <IconButton
-                    disabled={!searchOptions.sort["jobApplicant.name"].status}
-                    onClick={() => {
-                      setSearchOptions({
-                        ...searchOptions,
-                        sort: {
-                          ...searchOptions.sort,
-                          "jobApplicant.name": {
-                            ...searchOptions.sort["jobApplicant.name"],
-                            desc: !searchOptions.sort["jobApplicant.name"].desc,
-                          },
-                        },
-                      });
-                    }}
-                  >
-                    {searchOptions.sort["jobApplicant.name"].desc ? (
-                      <ArrowDownwardIcon />
-                    ) : (
-                      <ArrowUpwardIcon />
-                    )}
-                  </IconButton>
-                </Grid>
-              </Grid>
-              <Grid
-                item
-                container
-                xs={4}
-                justify="space-around"
-                alignItems="center"
-                style={{ border: "1px solid #D1D1D1", borderRadius: "5px" }}
-              >
-                <Grid item>
-                  <Checkbox
-                    name="dateOfApplication"
-                    checked={searchOptions.sort.dateOfApplication.status}
-                    onChange={(event) =>
-                      setSearchOptions({
-                        ...searchOptions,
-                        sort: {
-                          ...searchOptions.sort,
-                          dateOfApplication: {
-                            ...searchOptions.sort.dateOfApplication,
-                            status: event.target.checked,
-                          },
-                        },
-                      })
-                    }
-                    id="dateOfApplication"
-                  />
-                </Grid>
-                <Grid item>
-                  <label for="dateOfApplication">
-                    <Typography>Date of Application</Typography>
-                  </label>
-                </Grid>
-                <Grid item>
-                  <IconButton
-                    disabled={!searchOptions.sort.dateOfApplication.status}
-                    onClick={() => {
-                      setSearchOptions({
-                        ...searchOptions,
-                        sort: {
-                          ...searchOptions.sort,
-                          dateOfApplication: {
-                            ...searchOptions.sort.dateOfApplication,
-                            desc: !searchOptions.sort.dateOfApplication.desc,
-                          },
-                        },
-                      });
-                    }}
-                  >
-                    {searchOptions.sort.dateOfApplication.desc ? (
-                      <ArrowDownwardIcon />
-                    ) : (
-                      <ArrowUpwardIcon />
-                    )}
-                  </IconButton>
-                </Grid>
-              </Grid>
-              <Grid
-                item
-                container
-                xs={4}
-                justify="space-around"
-                alignItems="center"
-                style={{ border: "1px solid #D1D1D1", borderRadius: "5px" }}
-              >
-                <Grid item>
-                  <Checkbox
-                    name="rating"
-                    checked={searchOptions.sort["jobApplicant.rating"].status}
-                    onChange={(event) =>
-                      setSearchOptions({
-                        ...searchOptions,
-                        sort: {
-                          ...searchOptions.sort,
-                          "jobApplicant.rating": {
-                            ...searchOptions.sort[["jobApplicant.rating"]],
-                            status: event.target.checked,
-                          },
-                        },
-                      })
-                    }
-                    id="rating"
-                  />
-                </Grid>
-                <Grid item>
-                  <label for="rating">
-                    <Typography>Rating</Typography>
-                  </label>
-                </Grid>
-                <Grid item>
-                  <IconButton
-                    disabled={!searchOptions.sort["jobApplicant.rating"].status}
-                    onClick={() => {
-                      setSearchOptions({
-                        ...searchOptions,
-                        sort: {
-                          ...searchOptions.sort,
-                          "jobApplicant.rating": {
-                            ...searchOptions.sort["jobApplicant.rating"],
-                            desc: !searchOptions.sort["jobApplicant.rating"]
-                              .desc,
-                          },
-                        },
-                      });
-                    }}
-                  >
-                    {searchOptions.sort["jobApplicant.rating"].desc ? (
-                      <ArrowDownwardIcon />
-                    ) : (
-                      <ArrowUpwardIcon />
-                    )}
-                  </IconButton>
-                </Grid>
-              </Grid>
-            </Grid>
-          </Grid>
 
-          <Grid item>
-            <Button
-              variant="contained"
-              color="primary"
-              style={{ padding: "10px 50px" }}
-              onClick={() => getData()}
-            >
-              Apply
-            </Button>
-          </Grid>
-        </Grid>
-      </Paper>
-    </Modal>
+  if (!open) return null;
+
+  const statusOptions = [
+    { name: "rejected", label: "Rejected" },
+    { name: "applied", label: "Applied" },
+    { name: "shortlisted", label: "Shortlisted" },
+  ];
+
+  const sortOptions = [
+    { key: "jobApplicant.name", id: "name", label: "Name" },
+    {
+      key: "dateOfApplication",
+      id: "dateOfApplication",
+      label: "Date of Application",
+    },
+    { key: "jobApplicant.rating", id: "rating", label: "Rating" },
+  ];
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4 overflow-y-auto"
+      onClick={handleClose}
+    >
+      <div
+        className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-2xl p-6 sm:p-8 space-y-6 my-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+          <div className="flex items-center gap-2">
+            <FilterListIcon className="text-indigo-600" />
+            <h3 className="text-lg font-bold text-slate-900">
+              Filter &amp; Sort Applications
+            </h3>
+          </div>
+          <button
+            type="button"
+            onClick={handleClose}
+            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+          >
+            <CloseIcon fontSize="small" />
+          </button>
+        </div>
+
+        {/* Application Status */}
+        <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
+          <label className="sm:col-span-3 text-sm font-semibold text-slate-700">
+            Application Status
+          </label>
+          <div className="sm:col-span-9 flex flex-wrap gap-2.5">
+            {statusOptions.map((item) => {
+              const checked = Boolean(searchOptions.status[item.name]);
+              return (
+                <label
+                  key={item.name}
+                  className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border text-sm font-medium cursor-pointer select-none transition-all ${
+                    checked
+                      ? "bg-indigo-50 border-indigo-500 text-indigo-700"
+                      : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    name={item.name}
+                    checked={checked}
+                    onChange={(event) => {
+                      setSearchOptions({
+                        ...searchOptions,
+                        status: {
+                          ...searchOptions.status,
+                          [event.target.name]: event.target.checked,
+                        },
+                      });
+                    }}
+                    className="rounded text-indigo-600 focus:ring-indigo-500"
+                  />
+                  <span>{item.label}</span>
+                </label>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Sort */}
+        <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
+          <label className="sm:col-span-3 text-sm font-semibold text-slate-700">
+            Sort
+          </label>
+          <div className="sm:col-span-9 grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+            {sortOptions.map((sortItem) => {
+              const isActive = searchOptions.sort[sortItem.key].status;
+              const isDesc = searchOptions.sort[sortItem.key].desc;
+              return (
+                <div
+                  key={sortItem.key}
+                  className={`flex items-center justify-between px-3 py-2 rounded-xl border transition-all ${
+                    isActive
+                      ? "border-indigo-500 bg-indigo-50/60"
+                      : "border-slate-200 bg-white"
+                  }`}
+                >
+                  <div className="flex items-center gap-2 min-w-0">
+                    <input
+                      type="checkbox"
+                      name={sortItem.id}
+                      id={sortItem.id}
+                      checked={isActive}
+                      onChange={(event) =>
+                        setSearchOptions({
+                          ...searchOptions,
+                          sort: {
+                            ...searchOptions.sort,
+                            [sortItem.key]: {
+                              ...searchOptions.sort[sortItem.key],
+                              status: event.target.checked,
+                            },
+                          },
+                        })
+                      }
+                      className="rounded text-indigo-600 focus:ring-indigo-500 cursor-pointer shrink-0"
+                    />
+                    <label
+                      htmlFor={sortItem.id}
+                      className="text-xs font-medium text-slate-700 cursor-pointer select-none truncate"
+                      title={sortItem.label}
+                    >
+                      {sortItem.label}
+                    </label>
+                  </div>
+                  <button
+                    type="button"
+                    disabled={!isActive}
+                    onClick={() => {
+                      setSearchOptions({
+                        ...searchOptions,
+                        sort: {
+                          ...searchOptions.sort,
+                          [sortItem.key]: {
+                            ...searchOptions.sort[sortItem.key],
+                            desc: !searchOptions.sort[sortItem.key].desc,
+                          },
+                        },
+                      });
+                    }}
+                    className={`p-1 rounded-lg transition-colors shrink-0 ${
+                      isActive
+                        ? "text-indigo-600 hover:bg-indigo-100"
+                        : "text-slate-300 cursor-not-allowed"
+                    }`}
+                  >
+                    {isDesc ? (
+                      <ArrowDownwardIcon fontSize="small" />
+                    ) : (
+                      <ArrowUpwardIcon fontSize="small" />
+                    )}
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Apply Footer */}
+        <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+          <button
+            type="button"
+            onClick={handleClose}
+            className="px-5 py-2.5 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={() => getData()}
+            className="px-8 py-2.5 rounded-xl text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm hover:shadow transition-all"
+          >
+            Apply
+          </button>
+        </div>
+      </div>
+    </div>
   );
 };
 
 const ApplicationTile = (props) => {
-  const classes = useStyles();
   const { application, getData } = props;
   const setPopup = useContext(SetPopupContext);
   const [open, setOpen] = useState(false);
+  const [imgError, setImgError] = useState(false);
 
   const appliedOn = new Date(application.dateOfApplication);
 
@@ -424,215 +297,269 @@ const ApplicationTile = (props) => {
 
   const buttonSet = {
     applied: (
-      <>
-        <Grid item xs>
-          <Button
-            className={classes.statusBlock}
-            style={{
-              background: colorSet["shortlisted"],
-              color: "#ffffff",
-            }}
-            onClick={() => updateStatus("shortlisted")}
-          >
-            Shortlist
-          </Button>
-        </Grid>
-        <Grid item xs>
-          <Button
-            className={classes.statusBlock}
-            style={{
-              background: colorSet["rejected"],
-              color: "#ffffff",
-            }}
-            onClick={() => updateStatus("rejected")}
-          >
-            Reject
-          </Button>
-        </Grid>
-      </>
+      <div className="grid grid-cols-2 lg:grid-cols-1 gap-2 w-full">
+        <button
+          type="button"
+          style={{
+            backgroundColor: colorSet["shortlisted"],
+            color: "#ffffff",
+          }}
+          onClick={() => updateStatus("shortlisted")}
+          className="w-full py-2.5 px-4 rounded-xl text-xs font-bold uppercase tracking-wider hover:opacity-90 shadow-sm transition-all flex items-center justify-center gap-1.5"
+        >
+          <PlaylistAddCheck style={{ fontSize: 16 }} />
+          <span>Shortlist</span>
+        </button>
+        <button
+          type="button"
+          style={{
+            backgroundColor: colorSet["rejected"],
+            color: "#ffffff",
+          }}
+          onClick={() => updateStatus("rejected")}
+          className="w-full py-2.5 px-4 rounded-xl text-xs font-bold uppercase tracking-wider hover:opacity-90 shadow-sm transition-all flex items-center justify-center gap-1.5"
+        >
+          <CancelOutlined style={{ fontSize: 16 }} />
+          <span>Reject</span>
+        </button>
+      </div>
     ),
     shortlisted: (
-      <>
-        <Grid item xs>
-          <Button
-            className={classes.statusBlock}
-            style={{
-              background: colorSet["accepted"],
-              color: "#ffffff",
-            }}
-            onClick={() => updateStatus("accepted")}
-          >
-            Accept
-          </Button>
-        </Grid>
-        <Grid item xs>
-          <Button
-            className={classes.statusBlock}
-            style={{
-              background: colorSet["rejected"],
-              color: "#ffffff",
-            }}
-            onClick={() => updateStatus("rejected")}
-          >
-            Reject
-          </Button>
-        </Grid>
-      </>
+      <div className="grid grid-cols-2 lg:grid-cols-1 gap-2 w-full">
+        <button
+          type="button"
+          style={{
+            backgroundColor: colorSet["accepted"],
+            color: "#ffffff",
+          }}
+          onClick={() => updateStatus("accepted")}
+          className="w-full py-2.5 px-4 rounded-xl text-xs font-bold uppercase tracking-wider hover:opacity-90 shadow-sm transition-all flex items-center justify-center gap-1.5"
+        >
+          <CheckCircleOutline style={{ fontSize: 16 }} />
+          <span>Accept</span>
+        </button>
+        <button
+          type="button"
+          style={{
+            backgroundColor: colorSet["rejected"],
+            color: "#ffffff",
+          }}
+          onClick={() => updateStatus("rejected")}
+          className="w-full py-2.5 px-4 rounded-xl text-xs font-bold uppercase tracking-wider hover:opacity-90 shadow-sm transition-all flex items-center justify-center gap-1.5"
+        >
+          <CancelOutlined style={{ fontSize: 16 }} />
+          <span>Reject</span>
+        </button>
+      </div>
     ),
     rejected: (
-      <>
-        <Grid item xs>
-          <Paper
-            className={classes.statusBlock}
-            style={{
-              background: colorSet["rejected"],
-              color: "#ffffff",
-            }}
-          >
-            Rejected
-          </Paper>
-        </Grid>
-      </>
+      <div
+        className="w-full py-2.5 px-4 rounded-xl text-center text-xs font-bold uppercase tracking-wider shadow-sm flex items-center justify-center gap-2"
+        style={{
+          backgroundColor: colorSet["rejected"],
+          color: "#ffffff",
+        }}
+      >
+        <span className="w-2 h-2 rounded-full bg-white/90" />
+        <span>Rejected</span>
+      </div>
     ),
     accepted: (
-      <>
-        <Grid item xs>
-          <Paper
-            className={classes.statusBlock}
-            style={{
-              background: colorSet["accepted"],
-              color: "#ffffff",
-            }}
-          >
-            Accepted
-          </Paper>
-        </Grid>
-      </>
+      <div
+        className="w-full py-2.5 px-4 rounded-xl text-center text-xs font-bold uppercase tracking-wider shadow-sm flex items-center justify-center gap-2"
+        style={{
+          backgroundColor: colorSet["accepted"],
+          color: "#ffffff",
+        }}
+      >
+        <span className="w-2 h-2 rounded-full bg-white/90" />
+        <span>Accepted</span>
+      </div>
     ),
     cancelled: (
-      <>
-        <Grid item xs>
-          <Paper
-            className={classes.statusBlock}
-            style={{
-              background: colorSet["cancelled"],
-              color: "#ffffff",
-            }}
-          >
-            Cancelled
-          </Paper>
-        </Grid>
-      </>
+      <div
+        className="w-full py-2.5 px-4 rounded-xl text-center text-xs font-bold uppercase tracking-wider shadow-sm flex items-center justify-center gap-2"
+        style={{
+          backgroundColor: colorSet["cancelled"],
+          color: "#ffffff",
+        }}
+      >
+        <span className="w-2 h-2 rounded-full bg-white/90" />
+        <span>Cancelled</span>
+      </div>
     ),
     finished: (
-      <>
-        <Grid item xs>
-          <Paper
-            className={classes.statusBlock}
-            style={{
-              background: colorSet["finished"],
-              color: "#ffffff",
-            }}
-          >
-            Finished
-          </Paper>
-        </Grid>
-      </>
+      <div
+        className="w-full py-2.5 px-4 rounded-xl text-center text-xs font-bold uppercase tracking-wider shadow-sm flex items-center justify-center gap-2"
+        style={{
+          backgroundColor: colorSet["finished"],
+          color: "#ffffff",
+        }}
+      >
+        <span className="w-2 h-2 rounded-full bg-white/90" />
+        <span>Finished</span>
+      </div>
     ),
   };
 
-  return (
-    <Paper className={classes.jobTileOuter} elevation={3}>
-      <Grid container>
-        <Grid
-          item
-          xs={2}
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <Avatar
-            src={`${server}${application.jobApplicant.profile}`}
-            className={classes.avatar}
-          />
-        </Grid>
-        <Grid container item xs={7} spacing={1} direction="column">
-          <Grid item>
-            <Typography variant="h5">
-              {application.jobApplicant.name}
-            </Typography>
-          </Grid>
-          <Grid item>
-            <Rating
-              value={
-                application.jobApplicant.rating !== -1
-                  ? application.jobApplicant.rating
-                  : null
-              }
-              readOnly
+  const renderRating = (val) => {
+    const filled = val !== -1 ? Math.round(val) : 0;
+    return (
+      <div className="flex items-center gap-0.5">
+        {[1, 2, 3, 4, 5].map((star) =>
+          star <= filled ? (
+            <Star key={star} className="text-amber-400" style={{ fontSize: 18 }} />
+          ) : (
+            <StarBorder
+              key={star}
+              className="text-slate-300"
+              style={{ fontSize: 18 }}
             />
-          </Grid>
-          <Grid item>Applied On: {appliedOn.toLocaleDateString()}</Grid>
-          <Grid item>
-            Education:{" "}
-            {application.jobApplicant.education
-              .map((edu) => {
-                return `${edu.institutionName} (${edu.startYear}-${
-                  edu.endYear ? edu.endYear : "Ongoing"
-                })`;
-              })
-              .join(", ")}
-          </Grid>
-          <Grid item>
-            SOP: {application.sop !== "" ? application.sop : "Not Submitted"}
-          </Grid>
-          <Grid item>
-            {application.jobApplicant.skills.map((skill) => (
-              <Chip label={skill} style={{ marginRight: "2px" }} />
-            ))}
-          </Grid>
-        </Grid>
-        <Grid item container direction="column" xs={3}>
-          <Grid item>
-            <Button
-              variant="contained"
-              className={classes.statusBlock}
-              color="primary"
-              onClick={() => getResume()}
-            >
-              Download Resume
-            </Button>
-          </Grid>
-          <Grid item container xs>
-            {buttonSet[application.status]}
-          </Grid>
-        </Grid>
-      </Grid>
-      <Modal open={open} onClose={handleClose} className={classes.popupDialog}>
-        <Paper
-          style={{
-            padding: "20px",
-            outline: "none",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            minWidth: "30%",
-            alignItems: "center",
-          }}
-        >
-          <Button
-            variant="contained"
-            color="primary"
-            style={{ padding: "10px 50px" }}
-            // onClick={() => changeRating()}
+          )
+        )}
+        <span className="ml-1.5 text-xs font-medium text-slate-500">
+          {val !== -1 ? Number(val).toFixed(1) : "Unrated"}
+        </span>
+      </div>
+    );
+  };
+
+  const educationText =
+    application.jobApplicant.education &&
+    application.jobApplicant.education.length > 0
+      ? application.jobApplicant.education
+          .map((edu) => {
+            return `${edu.institutionName} (${edu.startYear}-${
+              edu.endYear ? edu.endYear : "Ongoing"
+            })`;
+          })
+          .join(", ")
+      : "Not specified";
+
+  return (
+    <div className="bg-white rounded-2xl border border-slate-200/90 p-6 sm:p-7 mb-5 shadow-sm hover:shadow-md hover:border-indigo-200 transition-all duration-200">
+      <div className="flex flex-col lg:flex-row lg:items-stretch justify-between gap-6">
+        {/* Avatar + Applicant Info */}
+        <div className="flex flex-col sm:flex-row items-start gap-5 flex-1">
+          {/* Profile Avatar */}
+          <div className="shrink-0 mx-auto sm:mx-0">
+            {application.jobApplicant.profile && !imgError ? (
+              <img
+                src={`${server}${application.jobApplicant.profile}`}
+                alt={application.jobApplicant.name}
+                onError={() => setImgError(true)}
+                className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl object-cover border-2 border-slate-100 shadow-sm"
+              />
+            ) : (
+              <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-400">
+                <PersonOutline style={{ fontSize: 44 }} />
+              </div>
+            )}
+          </div>
+
+          {/* Applicant Details */}
+          <div className="flex-1 w-full space-y-3.5">
+            <div className="text-center sm:text-left">
+              <h2 className="text-xl font-bold text-slate-900 tracking-tight">
+                {application.jobApplicant.name}
+              </h2>
+              <div className="mt-1 flex justify-center sm:justify-start">
+                {renderRating(application.jobApplicant.rating)}
+              </div>
+            </div>
+
+            {/* Metadata Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              <div className="flex items-center gap-2.5 bg-slate-50 px-3 py-2 rounded-lg">
+                <EventNote className="text-indigo-500" fontSize="small" />
+                <div>
+                  <p className="text-[11px] uppercase tracking-wider text-slate-400 font-semibold">
+                    Applied On
+                  </p>
+                  <p className="text-xs font-semibold text-slate-800">
+                    {appliedOn.toLocaleDateString()}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-2.5 bg-slate-50 px-3 py-2 rounded-lg">
+                <SchoolOutlined
+                  className="text-indigo-500 mt-0.5 shrink-0"
+                  fontSize="small"
+                />
+                <div className="min-w-0">
+                  <p className="text-[11px] uppercase tracking-wider text-slate-400 font-semibold">
+                    Education
+                  </p>
+                  <p className="text-xs font-semibold text-slate-800 leading-snug">
+                    {educationText}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* SOP Box */}
+            <div className="p-3 rounded-xl bg-slate-50/80 border border-slate-200/70 text-xs text-slate-600 leading-relaxed">
+              <span className="font-bold text-slate-700 mr-1.5 inline-flex items-center gap-1">
+                <DescriptionOutlined style={{ fontSize: 14 }} />
+                SOP:
+              </span>
+              {application.sop !== "" ? application.sop : "Not Submitted"}
+            </div>
+
+            {/* Skills */}
+            {application.jobApplicant.skills &&
+              application.jobApplicant.skills.length > 0 && (
+                <div className="flex flex-wrap items-center gap-1.5">
+                  {application.jobApplicant.skills.map((skill, idx) => (
+                    <span
+                      key={`${skill}-${idx}`}
+                      className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200/70"
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              )}
+          </div>
+        </div>
+
+        {/* Right Action Column */}
+        <div className="flex flex-col justify-center gap-2.5 lg:w-48 shrink-0 border-t lg:border-t-0 lg:border-l border-slate-100 pt-4 lg:pt-0 lg:pl-6">
+          <button
+            type="button"
+            onClick={() => getResume()}
+            className="w-full py-2.5 px-4 rounded-xl text-xs font-semibold uppercase tracking-wider bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm transition-all flex items-center justify-center gap-1.5"
           >
-            Submit
-          </Button>
-        </Paper>
-      </Modal>
-    </Paper>
+            <GetApp style={{ fontSize: 16 }} />
+            <span>Download Resume</span>
+          </button>
+
+          <div className="w-full">{buttonSet[application.status]}</div>
+        </div>
+      </div>
+
+      {/* Modal */}
+      {open && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4"
+          onClick={handleClose}
+        >
+          <div
+            className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md p-6 sm:p-8 flex flex-col items-center justify-center space-y-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              // onClick={() => changeRating()}
+              className="px-8 py-2.5 rounded-xl text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm transition-all"
+            >
+              Submit
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 
@@ -727,44 +654,54 @@ const JobApplications = (props) => {
 
   return (
     <>
-      <Grid
-        container
-        item
-        direction="column"
-        alignItems="center"
-        style={{ padding: "30px", minHeight: "93vh" }}
-      >
-        <Grid item>
-          <Typography variant="h2">Applications</Typography>
-        </Grid>
-        <Grid item>
-          <IconButton onClick={() => setFilterOpen(true)}>
-            <FilterListIcon />
-          </IconButton>
-        </Grid>
-        <Grid
-          container
-          item
-          xs
-          direction="column"
-          style={{ width: "100%" }}
-          alignItems="stretch"
-          justify="center"
-        >
-          {applications.length > 0 ? (
-            applications.map((obj) => (
-              <Grid item>
-                {/* {console.log(obj)} */}
-                <ApplicationTile application={obj} getData={getData} />
-              </Grid>
-            ))
-          ) : (
-            <Typography variant="h5" style={{ textAlign: "center" }}>
-              No Applications Found
-            </Typography>
-          )}
-        </Grid>
-      </Grid>
+      <div className="min-h-screen bg-slate-50 pt-24 pb-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-5xl mx-auto space-y-8">
+          {/* Header & Filter Button */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="text-center sm:text-left">
+              <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+                Applications
+              </h1>
+              <p className="text-sm text-slate-500 mt-1">
+                Review candidates, download resumes, and update application stages
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setFilterOpen(true)}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white border border-slate-200 shadow-sm text-sm font-semibold text-slate-700 hover:border-indigo-300 hover:text-indigo-600 hover:bg-indigo-50/40 transition-all"
+            >
+              <FilterListIcon fontSize="small" />
+              <span>Filter &amp; Sort</span>
+            </button>
+          </div>
+
+          {/* Applications List */}
+          <div>
+            {applications.length > 0 ? (
+              applications.map((obj) => (
+                <div key={obj._id}>
+                  <ApplicationTile application={obj} getData={getData} />
+                </div>
+              ))
+            ) : (
+              <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center shadow-sm">
+                <div className="mx-auto w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 mb-3">
+                  <AssignmentOutlined />
+                </div>
+                <h3 className="text-lg font-semibold text-slate-800">
+                  No Applications Found
+                </h3>
+                <p className="text-sm text-slate-500 mt-1">
+                  Try clearing your status filters or check back later for new applicants.
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
       <FilterPopup
         open={filterOpen}
         searchOptions={searchOptions}

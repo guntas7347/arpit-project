@@ -1,19 +1,19 @@
 import { useState, useContext } from "react";
-import {
-  Grid,
-  TextField,
-  Button,
-  Typography,
-  makeStyles,
-  Paper,
-  MenuItem,
-  Input,
-} from "@material-ui/core";
 import axios from "axios";
-import { Redirect } from "react-router-dom";
-import ChipInput from "material-ui-chip-input";
+import { Redirect, Link } from "react-router-dom";
 import DescriptionIcon from "@material-ui/icons/Description";
 import FaceIcon from "@material-ui/icons/Face";
+import {
+  PersonOutline,
+  BusinessCenterOutlined,
+  SchoolOutlined,
+  AddCircleOutline,
+  CodeOutlined,
+  Close as CloseIcon,
+  HowToRegOutlined,
+  PhoneOutlined,
+  SubjectOutlined,
+} from "@material-ui/icons";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/material.css";
 
@@ -25,76 +25,70 @@ import { SetPopupContext } from "../App";
 import apiList from "../lib/apiList";
 import isAuth from "../lib/isAuth";
 
-const useStyles = makeStyles((theme) => ({
-  body: {
-    padding: "60px 60px",
-  },
-  inputBox: {
-    width: "400px",
-  },
-  submitButton: {
-    width: "400px",
-  },
-}));
-
 const MultifieldInput = (props) => {
-  const classes = useStyles();
   const { education, setEducation } = props;
 
   return (
-    <>
+    <div className="space-y-3 w-full">
       {education.map((obj, key) => (
-        <Grid
-          item
-          container
-          className={classes.inputBox}
+        <div
           key={key}
-          style={{ paddingLeft: 0, paddingRight: 0 }}
+          className="grid grid-cols-1 sm:grid-cols-12 gap-3 p-4 rounded-xl bg-slate-50/80 border border-slate-200/80"
         >
-          <Grid item xs={6}>
-            <TextField
-              label={`Institution Name #${key + 1}`}
+          <div className="sm:col-span-6">
+            <label className="block text-xs font-semibold text-slate-600 mb-1">
+              {`Institution Name #${key + 1}`}
+            </label>
+            <input
+              type="text"
+              placeholder={`Institution Name #${key + 1}`}
               value={education[key].institutionName}
               onChange={(event) => {
                 const newEdu = [...education];
                 newEdu[key].institutionName = event.target.value;
                 setEducation(newEdu);
               }}
-              variant="outlined"
+              className="w-full rounded-xl bg-white border border-slate-300 px-3.5 py-2.5 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
             />
-          </Grid>
-          <Grid item xs={3}>
-            <TextField
-              label="Start Year"
-              value={obj.startYear}
-              variant="outlined"
+          </div>
+          <div className="sm:col-span-3">
+            <label className="block text-xs font-semibold text-slate-600 mb-1">
+              Start Year
+            </label>
+            <input
               type="number"
+              placeholder="YYYY"
+              value={obj.startYear}
               onChange={(event) => {
                 const newEdu = [...education];
                 newEdu[key].startYear = event.target.value;
                 setEducation(newEdu);
               }}
+              className="w-full rounded-xl bg-white border border-slate-300 px-3.5 py-2.5 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
             />
-          </Grid>
-          <Grid item xs={3}>
-            <TextField
-              label="End Year"
-              value={obj.endYear}
-              variant="outlined"
+          </div>
+          <div className="sm:col-span-3">
+            <label className="block text-xs font-semibold text-slate-600 mb-1">
+              End Year
+            </label>
+            <input
               type="number"
+              placeholder="YYYY"
+              value={obj.endYear}
               onChange={(event) => {
                 const newEdu = [...education];
                 newEdu[key].endYear = event.target.value;
                 setEducation(newEdu);
               }}
+              className="w-full rounded-xl bg-white border border-slate-300 px-3.5 py-2.5 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
             />
-          </Grid>
-        </Grid>
+          </div>
+        </div>
       ))}
-      <Grid item>
-        <Button
-          variant="contained"
-          color="secondary"
+
+      <div>
+        <button
+          type="button"
           onClick={() =>
             setEducation([
               ...education,
@@ -105,20 +99,21 @@ const MultifieldInput = (props) => {
               },
             ])
           }
-          className={classes.inputBox}
+          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border-2 border-dashed border-indigo-200 bg-indigo-50/40 text-indigo-600 hover:bg-indigo-50 hover:border-indigo-300 text-sm font-semibold transition-all"
         >
-          Add another institution details
-        </Button>
-      </Grid>
-    </>
+          <AddCircleOutline fontSize="small" />
+          <span>Add another institution details</span>
+        </button>
+      </div>
+    </div>
   );
 };
 
 const Login = (props) => {
-  const classes = useStyles();
   const setPopup = useContext(SetPopupContext);
 
   const [loggedin, setLoggedin] = useState(isAuth());
+  const [skillInput, setSkillInput] = useState("");
 
   const [signupDetails, setSignupDetails] = useState({
     type: "applicant",
@@ -320,138 +315,246 @@ const Login = (props) => {
     }
   };
 
+  const bioWordCount = signupDetails.bio
+    .split(" ")
+    .filter(function (n) {
+      return n != "";
+    }).length;
+
   return loggedin ? (
     <Redirect to="/" />
   ) : (
-    <Paper elevation={3} className={classes.body}>
-      <Grid container direction="column" spacing={4} alignItems="center">
-        <Grid item>
-          <Typography variant="h3" component="h2">
-            Signup
-          </Typography>
-        </Grid>
-        <Grid item>
-          <TextField
-            select
-            label="Category"
-            variant="outlined"
-            className={classes.inputBox}
-            value={signupDetails.type}
-            onChange={(event) => {
-              handleInput("type", event.target.value);
-            }}
-          >
-            <MenuItem value="applicant">Applicant</MenuItem>
-            <MenuItem value="recruiter">Recruiter</MenuItem>
-          </TextField>
-        </Grid>
-        <Grid item>
-          <TextField
-            label="Name"
-            value={signupDetails.name}
-            onChange={(event) => handleInput("name", event.target.value)}
-            className={classes.inputBox}
-            error={inputErrorHandler.name.error}
-            helperText={inputErrorHandler.name.message}
-            onBlur={(event) => {
-              if (event.target.value === "") {
-                handleInputError("name", true, "Name is required");
-              } else {
-                handleInputError("name", false, "");
-              }
-            }}
-            variant="outlined"
-          />
-        </Grid>
-        <Grid item>
-          <EmailInput
-            label="Email"
-            value={signupDetails.email}
-            onChange={(event) => handleInput("email", event.target.value)}
-            inputErrorHandler={inputErrorHandler}
-            handleInputError={handleInputError}
-            className={classes.inputBox}
-            required={true}
-          />
-        </Grid>
-        <Grid item>
-          <PasswordInput
-            label="Password"
-            value={signupDetails.password}
-            onChange={(event) => handleInput("password", event.target.value)}
-            className={classes.inputBox}
-            error={inputErrorHandler.password.error}
-            helperText={inputErrorHandler.password.message}
-            onBlur={(event) => {
-              if (event.target.value === "") {
-                handleInputError("password", true, "Password is required");
-              } else {
-                handleInputError("password", false, "");
-              }
-            }}
-          />
-        </Grid>
-        {signupDetails.type === "applicant" ? (
-          <>
-            <MultifieldInput
-              education={education}
-              setEducation={setEducation}
-            />
-            <Grid item>
-              <ChipInput
-                className={classes.inputBox}
-                label="Skills"
-                variant="outlined"
-                helperText="Press enter to add skills"
-                onChange={(chips) =>
-                  setSignupDetails({ ...signupDetails, skills: chips })
+    <div className="min-h-screen bg-slate-50 pt-24 pb-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
+      <div className="w-full max-w-2xl bg-white rounded-2xl border border-slate-200/90 shadow-sm p-6 sm:p-10 space-y-8">
+        {/* Header */}
+        <div className="text-center space-y-1.5">
+          <div className="mx-auto w-12 h-12 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 mb-3">
+            <HowToRegOutlined />
+          </div>
+          <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">
+            Create an Account
+          </h2>
+          <p className="text-sm text-slate-500">
+            Join Job Portal as an applicant or recruiter
+          </p>
+        </div>
+
+        {/* Category Switcher */}
+        <div className="space-y-2">
+          <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600">
+            Category
+          </label>
+          <div className="grid grid-cols-2 gap-3 p-1.5 rounded-xl bg-slate-100 border border-slate-200/70">
+            <button
+              type="button"
+              onClick={() => handleInput("type", "applicant")}
+              className={`flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-semibold transition-all ${
+                signupDetails.type === "applicant"
+                  ? "bg-white text-indigo-600 shadow-sm"
+                  : "text-slate-600 hover:text-slate-900"
+              }`}
+            >
+              <PersonOutline fontSize="small" />
+              <span>Applicant</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => handleInput("type", "recruiter")}
+              className={`flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-semibold transition-all ${
+                signupDetails.type === "recruiter"
+                  ? "bg-white text-indigo-600 shadow-sm"
+                  : "text-slate-600 hover:text-slate-900"
+              }`}
+            >
+              <BusinessCenterOutlined fontSize="small" />
+              <span>Recruiter</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Core Account Fields */}
+        <div className="space-y-5">
+          {/* Name */}
+          <div>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
+              Name
+            </label>
+            <input
+              type="text"
+              placeholder="Enter your full name"
+              value={signupDetails.name}
+              onChange={(event) => handleInput("name", event.target.value)}
+              onBlur={(event) => {
+                if (event.target.value === "") {
+                  handleInputError("name", true, "Name is required");
+                } else {
+                  handleInputError("name", false, "");
                 }
+              }}
+              className={`w-full rounded-xl bg-white border px-4 py-2.5 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 transition-all ${
+                inputErrorHandler.name.error
+                  ? "border-rose-500 focus:ring-rose-500"
+                  : "border-slate-300 focus:ring-indigo-500 focus:border-indigo-500"
+              }`}
+            />
+            {inputErrorHandler.name.error && (
+              <p className="mt-1.5 text-xs font-medium text-rose-600">
+                {inputErrorHandler.name.message}
+              </p>
+            )}
+          </div>
+
+          {/* Email */}
+          <div>
+            <EmailInput
+              label="Email"
+              value={signupDetails.email}
+              onChange={(event) => handleInput("email", event.target.value)}
+              inputErrorHandler={inputErrorHandler}
+              handleInputError={handleInputError}
+              className="w-full"
+              required={true}
+            />
+          </div>
+
+          {/* Password */}
+          <div>
+            <PasswordInput
+              label="Password"
+              value={signupDetails.password}
+              onChange={(event) => handleInput("password", event.target.value)}
+              className="w-full"
+              error={inputErrorHandler.password.error}
+              helperText={inputErrorHandler.password.message}
+              onBlur={(event) => {
+                if (event.target.value === "") {
+                  handleInputError("password", true, "Password is required");
+                } else {
+                  handleInputError("password", false, "");
+                }
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Role-Specific Fields */}
+        {signupDetails.type === "applicant" ? (
+          <div className="space-y-6 pt-2 border-t border-slate-100">
+            {/* Education */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 text-slate-800">
+                <SchoolOutlined className="text-indigo-600" fontSize="small" />
+                <h3 className="text-sm font-bold">Education Details</h3>
+              </div>
+              <MultifieldInput
+                education={education}
+                setEducation={setEducation}
               />
-            </Grid>
-            <Grid item>
-              <FileUploadInput
-                className={classes.inputBox}
-                label="Resume (.pdf)"
-                icon={<DescriptionIcon />}
-                // value={files.resume}
-                // onChange={(event) =>
-                //   setFiles({
-                //     ...files,
-                //     resume: event.target.files[0],
-                //   })
-                // }
-                uploadTo={apiList.uploadResume}
-                handleInput={handleInput}
-                identifier={"resume"}
-              />
-            </Grid>
-            <Grid item>
-              <FileUploadInput
-                className={classes.inputBox}
-                label="Profile Photo (.jpg/.png)"
-                icon={<FaceIcon />}
-                // value={files.profileImage}
-                // onChange={(event) =>
-                //   setFiles({
-                //     ...files,
-                //     profileImage: event.target.files[0],
-                //   })
-                // }
-                uploadTo={apiList.uploadProfileImage}
-                handleInput={handleInput}
-                identifier={"profile"}
-              />
-            </Grid>
-          </>
+            </div>
+
+            {/* Skills */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-slate-800">
+                <CodeOutlined className="text-indigo-600" fontSize="small" />
+                <label className="text-sm font-bold">Skills</label>
+              </div>
+              <div className="w-full rounded-xl bg-white border border-slate-300 p-2.5 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:border-indigo-500 transition-all">
+                <div className="flex flex-wrap items-center gap-2">
+                  {signupDetails.skills.map((chip, index) => (
+                    <span
+                      key={`${chip}-${index}`}
+                      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200/80"
+                    >
+                      <span>{chip}</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const updatedSkills = signupDetails.skills.filter(
+                            (_, i) => i !== index
+                          );
+                          setSignupDetails({
+                            ...signupDetails,
+                            skills: updatedSkills,
+                          });
+                        }}
+                        className="text-indigo-400 hover:text-indigo-700 focus:outline-none"
+                        aria-label={`Remove ${chip}`}
+                      >
+                        <CloseIcon style={{ fontSize: 14 }} />
+                      </button>
+                    </span>
+                  ))}
+                  <input
+                    type="text"
+                    value={skillInput}
+                    onChange={(e) => setSkillInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && skillInput.trim() !== "") {
+                        e.preventDefault();
+                        setSignupDetails({
+                          ...signupDetails,
+                          skills: [...signupDetails.skills, skillInput.trim()],
+                        });
+                        setSkillInput("");
+                      }
+                    }}
+                    placeholder="Type a skill and press Enter..."
+                    className="flex-1 min-w-[160px] text-sm text-slate-800 placeholder-slate-400 focus:outline-none py-1 px-1.5"
+                  />
+                </div>
+              </div>
+              <p className="text-xs text-slate-400">
+                Press enter to add skills
+              </p>
+            </div>
+
+            {/* File Uploads */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/80">
+                <FileUploadInput
+                  className="w-full"
+                  label="Resume (.pdf)"
+                  icon={<DescriptionIcon />}
+                  uploadTo={apiList.uploadResume}
+                  handleInput={handleInput}
+                  identifier={"resume"}
+                />
+              </div>
+              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/80">
+                <FileUploadInput
+                  className="w-full"
+                  label="Profile Photo (.jpg/.png)"
+                  icon={<FaceIcon />}
+                  uploadTo={apiList.uploadProfileImage}
+                  handleInput={handleInput}
+                  identifier={"profile"}
+                />
+              </div>
+            </div>
+          </div>
         ) : (
-          <>
-            <Grid item style={{ width: "100%" }}>
-              <TextField
-                label="Bio (upto 250 words)"
-                multiline
-                rows={8}
-                style={{ width: "100%" }}
-                variant="outlined"
+          <div className="space-y-5 pt-2 border-t border-slate-100">
+            {/* Bio */}
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-600">
+                  <SubjectOutlined
+                    className="text-indigo-600"
+                    style={{ fontSize: 16 }}
+                  />
+                  <span>Bio (upto 250 words)</span>
+                </label>
+                <span
+                  className={`text-xs font-medium ${
+                    bioWordCount >= 240 ? "text-amber-600" : "text-slate-400"
+                  }`}
+                >
+                  {bioWordCount} / 250 words
+                </span>
+              </div>
+              <textarea
+                rows={6}
+                placeholder="Tell applicants about yourself or your company..."
                 value={signupDetails.bio}
                 onChange={(event) => {
                   if (
@@ -462,56 +565,64 @@ const Login = (props) => {
                     handleInput("bio", event.target.value);
                   }
                 }}
+                className="w-full rounded-xl bg-white border border-slate-300 px-4 py-3 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all resize-none"
               />
-            </Grid>
-            <Grid item>
-              <PhoneInput
-                country={"in"}
-                value={phone}
-                onChange={(phone) => setPhone(phone)}
-              />
-            </Grid>
-          </>
+            </div>
+
+            {/* Phone Input */}
+            <div>
+              <label className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-600 mb-2">
+                <PhoneOutlined
+                  className="text-indigo-600"
+                  style={{ fontSize: 16 }}
+                />
+                <span>Contact Number</span>
+              </label>
+              <div className="w-full">
+                <PhoneInput
+                  country={"in"}
+                  value={phone}
+                  onChange={(phone) => setPhone(phone)}
+                  inputStyle={{
+                    width: "100%",
+                    height: "44px",
+                    borderRadius: "0.75rem",
+                    borderColor: "#cbd5e1",
+                    fontSize: "0.875rem",
+                  }}
+                />
+              </div>
+            </div>
+          </div>
         )}
 
-        <Grid item>
-          <Button
-            variant="contained"
-            color="primary"
+        {/* Submit Button */}
+        <div className="pt-2 space-y-4">
+          <button
+            type="button"
             onClick={() => {
               signupDetails.type === "applicant"
                 ? handleLogin()
                 : handleLoginRecruiter();
             }}
-            className={classes.submitButton}
+            className="w-full py-3 px-6 rounded-xl text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm hover:shadow active:scale-[0.99] transition-all"
           >
             Signup
-          </Button>
-        </Grid>
-      </Grid>
-    </Paper>
+          </button>
+
+          <p className="text-center text-xs text-slate-500">
+            Already have an account?{" "}
+            <Link
+              to="/login"
+              className="font-semibold text-indigo-600 hover:text-indigo-700"
+            >
+              Log in
+            </Link>
+          </p>
+        </div>
+      </div>
+    </div>
   );
 };
 
 export default Login;
-
-// {/* <Grid item>
-//           <PasswordInput
-//             label="Re-enter Password"
-//             value={signupDetails.tmpPassword}
-//             onChange={(event) => handleInput("tmpPassword", event.target.value)}
-//             className={classes.inputBox}
-//             labelWidth={140}
-//             helperText={inputErrorHandler.tmpPassword.message}
-//             error={inputErrorHandler.tmpPassword.error}
-//             onBlur={(event) => {
-//               if (event.target.value !== signupDetails.password) {
-//                 handleInputError(
-//                   "tmpPassword",
-//                   true,
-//                   "Passwords are not same."
-//                 );
-//               }
-//             }}
-//           />
-//         </Grid> */}
